@@ -96,18 +96,17 @@ values
 (10, '2024-12-09', '90123456789', 'Transporte', 109),
 (5, '2024-12-10', '01234567890', 'Guindaste', 110);
 
--- Inserção de Cidades 
-insert into CIDADE (nome_cidade)
+insert into CIDADE (nome_cidade, nome_estado)
 values 
-('São Paulo'),
-('Rio de Janeiro'),
-('Salvador'),
-('Fortaleza'),
-('Recife'),
-('Belo Horizonte'),
-('Manaus'),
-('Curitiba'),
-('Porto Alegre');
+('São Paulo', 'SP'),
+('Rio de Janeiro', 'RJ'),
+('Salvador', 'BA'),
+('Fortaleza', 'CE'),
+('Recife', 'PE'),
+('Belo Horizonte', 'MG'),
+('Manaus', 'AM'),
+('Curitiba', 'PR'),
+('Porto Alegre', 'RS');
 
 -- Inserção de Serviços em OFERTASERVICOEM
 insert into OFERTASERVICOEM (nome_empresa, nome_cidade, nome_servico, preco_hora)
