@@ -1,91 +1,185 @@
+import tkinter as tk
+from tkinter import ttk
 import psycopg2
+from consultas import (consulta_1, consulta_2, consulta_3, consulta_4, consulta_5, consulta_6, consulta_7, consulta_8, consulta_9, consulta_10)
 from db_connection import conectar_banco
 
-#importar consultas dps
-
-from consultas import (consulta_1, consulta_2, consulta_3, consulta_4, consulta_5, consulta_6, consulta_7, consulta_8, consulta_9, consulta_10) 
- 
-def menu_banco():
-    while True:
-        print("CONSULTAS:\n")
-        print("1: Que tipo de serviços um determinado cliente X solicitou no último mês")
-        print("2: Qual é a empresa que mais ofereceu serviços à cidade de Y no estado de Z")
-        print("3: Quais funcionários (nome e sobrenome) trabalharam para o cliente X no mês Y do ano Z")
-        print("4: Listar as solicitações feitas no último ano (nome do cliente, municípios de origem e destino, preço total)")
-        print("5: Listar o faturamento das empresas por mês em um ano X")
-        print("6: Verificar qual o serviço mais solicitado no último mês entre todas empresas")
-        print("7: Listar o serviço mais solicitado e o número de solicitações para cada empresa")
-        print("8: Verificar em qual cidade houve o maior número de solicitações")
-        print("9: Verificar qual a cidade destino mais referenciada nos pedidos e sua quantidade")
-        print("10: Listar para cada empresa o seu faturamento total")
-        print("0: Sair")
+def consulta():
+    resultado_texto.delete("1.0","end")
+    query = menu_dropdown.current() + 1
+    query_params = [] 
+    
+    num_options = len(opcoes_num_param[query-1])
+    query = str(query)
+    if num_options > 0:
+        query_params.append(input_param1.get())
+    if num_options > 1:
+        query_params.append(input_param2.get())
+    if num_options > 2:
+        query_params.append(input_param3.get())
         
-        opcao = input("Escolha uma opção: ")
-        
-        if opcao == "0":
-            print("saindo do menu de consultas...")
-            break
 
-        try:
-            connection = conectar_banco()
-            cursor = connection.cursor()
-            
-            match opcao:
-                case "1":
-                    cliente_id = input("digite o ID do cliente: ")
-                    resultado = consulta_1(cursor, cliente_id)
-                    print("servicos solicitados no último mês:", resultado)
-                case "2":
-                    cidade = input("digite a cidade: ")
-                    estado = input("digite o estado: ")
-                    resultado = consulta_2(cursor, cidade, estado)
-                    print("empresa que mais ofereceu serviços:", resultado)
-                case "3":
-                    cliente_id = input("digite o ID do cliente: ")
-                    mes = int(input("digite o mês (1-12): "))
-                    ano = int(input("digite o ano: "))
-                    resultado = consulta_3(cursor, cliente_id, mes, ano)
-                    print("funcionários que trabalharam para o cliente:", resultado)
-                case "4":
-                    resultado = consulta_4(cursor)
-                    print("solicitaçoes feitas no último ano:")
-                    for row in resultado:
-                        print(row)
-                case "5":
-                    ano = int(input("digite o ano: "))
-                    resultado = consulta_5(cursor, ano)
-                    print("faturamento das empresas por mês no ano especificado:")
-                    for row in resultado:
-                        print(row)
-                case "6":
-                    resultado = consulta_6(cursor)
-                    print("servico mais solicitado no último mês:", resultado)
-                case "7":
-                    resultado = consulta_7(cursor)
-                    print("servico mais solicitado e o número de solicitações para cada empresa:")
-                    for row in resultado:
-                        print(row)
-                case "8":
-                    resultado = consulta_8(cursor)
-                    print("cidade com maior número de solicitações:", resultado)
-                case "9":
-                    resultado = consulta_9(cursor)
-                    print("cidade destino mais referenciada e sua quantidade de pedidos:", resultado)
-                case "10":
-                    resultado = consulta_10(cursor)
-                    print("faturamento total de cada empresa:")
-                    for row in resultado:
-                        print(row)
-                case _:
-                    print("opção inválida. tente novamente.")
+    resultado = connect_to_db(query, query_params)
+    
+    #aqui em result ent ele volta o que veio da consulta
+    #Em query tem um numero indicando a consulta (0-9)
+    #Em query_params tem um array que caso necessario, tem os 
+    #parametros passados X Y Z nas posicoes 0, 1, 2
+    #result = insira_funcao(query, query_params)
 
-            cursor.close()
-            connection.close()
+    #Teste
+    resultado_texto.insert(tk.END, resultado)
+    #print(query_params)
 
-        except Exception as e:
-            print(f"erro inesperado: {e}")
-            break
+def connect_to_db(query, query_params):
+    resultado = ""
+    try:
+        connection = conectar_banco()
+        cursor = connection.cursor()
+        match query:
+            case "1":
+                cliente_id = query_params[0]
+                resultado = consulta_1(cursor, cliente_id)
+            case "2":
+                cidade = query_params[0]
+                estado = query_params[1]
+                resultado = consulta_2(cursor, cidade, estado)
+            case "3":
+                cliente_id = query_params[0]
+                mes = int(query_params[1])
+                ano = int(query_params[2])
+                resultado = consulta_3(cursor, cliente_id, mes, ano)
+            case "4":
+                resultado = consulta_4(cursor)
+            case "5":
+                ano = int(query_params[0])
+                resultado = consulta_5(cursor, ano)
+            case "6":
+                resultado = consulta_6(cursor)
 
-        
-if __name__ == "__main__":
-    menu_banco()
+            case "7":
+                resultado = consulta_7(cursor)
+            case "8":
+                resultado = consulta_8(cursor)
+            case "9":
+                resultado = consulta_9(cursor)
+            case "10":
+                resultado = consulta_10(cursor)
+
+        cursor.close()
+        connection.close()
+
+    except Exception as e:
+        print(f"erro inesperado: {e}")
+    return resultado
+
+
+def show_param1(new_text):
+    lbl_param1.place(x=10, y=50, width=120, height=25)
+    lbl_param1.config(text = new_text)
+    input_param1.place(x=135, y=50, width=200, height=25)
+
+def show_param2(new_text):
+    lbl_param2.place(x=10, y=90, width=120, height=25)
+    lbl_param2.config(text = new_text)
+    input_param2.place(x=135, y=90, width=200, height=25)
+
+def show_param3(new_text):
+    lbl_param3.place(x=10, y=130, width=120, height=25)
+    lbl_param3.config(text = new_text)
+    input_param3.place(x=135, y=130, width=200, height=25)
+
+def hide_all():
+    lbl_param1.place_forget()
+    input_param1.place_forget()
+    input_param1.delete(0, "end")
+
+    lbl_param2.place_forget()
+    input_param2.place_forget()
+    input_param2.delete(0, "end")
+
+    lbl_param3.place_forget()
+    input_param3.place_forget()
+    input_param3.delete(0, "end")
+
+def option_selected(event):
+    hide_all()
+    index = menu_dropdown.current()
+    num_options = len(opcoes_num_param[index])
+    if num_options > 0:
+        show_param1(opcoes_num_param[index][0])
+    if num_options > 1:
+        show_param2(opcoes_num_param[index][1])
+    if num_options > 2:
+        show_param3(opcoes_num_param[index][2])
+
+
+janela = tk.Tk()
+janela.title("Interface de Consulta ao Banco de Dados")
+
+janela.geometry("660x500")
+janela.resizable(False, False)
+
+# Dropdown
+label1 = tk.Label(janela, text="Selecione a consulta", anchor="w")
+label1.place(x=10, y=10, width=120, height=25)
+
+opcoes = [
+    "Tipo de serviços que um determinado cliente solicitou no último mês",
+    "Empresa que mais ofereceu serviços à cidade Y do estado Z",
+    "Funcionários que trabalharam para o cliente X no mês Y do ano Z",
+    "Solicitações feitas no último ano, junto ao cliente, locais e preço total de cada solicitação",
+    "Faturamento das empresas por mês em um ano X.",
+    "Serviço mais solicitado no último mês entre todas empresas",
+    "Nome do serviço mais solicitado, e o número de solicitações para cada empresa",
+    "Cidade com o maior número de solicitações",
+    "Cidade destino mais referenciada nos pedidos e a sua quantidade de pedidos",
+    "Empresas e o seu faturamento total"
+]
+
+opcoes_num_param = [
+    ["Nome do Cliente"],
+    ["Nome da Cidade", "Nome do Estado"],
+    ["Nome do Cliente", "Mês", "Ano"],
+    [],
+    ["Ano"],
+    [],
+    [],
+    [],
+    [],
+    []
+]
+
+menu_dropdown = ttk.Combobox(janela, values=opcoes, state="readonly")
+menu_dropdown.set(opcoes[0])
+menu_dropdown.place(x=135, y=10, width=510, height=25)
+menu_dropdown.bind("<<ComboboxSelected>>", option_selected)
+
+# Inputs e Labels
+lbl_param1 = tk.Label(janela, text="Nome do Cliente", anchor="w")
+lbl_param1.place(x=10, y=50, width=120, height=25)
+
+input_param1 = tk.Entry(janela)
+input_param1.place(x=135, y=50, width=200, height=25)
+
+lbl_param2 = tk.Label(janela, text="", anchor="w")
+input_param2 = tk.Entry(janela)
+
+lbl_param3 = tk.Label(janela, text="", anchor="w")
+input_param3 = tk.Entry(janela)
+
+# Botão Consultar
+btn_consultar = tk.Button(janela, text="Consultar", command=consulta)
+btn_consultar.place(x=565, y=240, width=80, height=25)
+
+# Área de Resultados
+resultado_label = tk.Label(janela, text="Área de Resultados")
+resultado_label.place(x=10, y=240, width=120, height=25)
+
+resultado_texto = tk.Text(janela, height=10)
+resultado_texto.place(x=10, y=270, width=635, height=220)
+
+# Iniciar o loop da interface
+janela.mainloop()
+
+
