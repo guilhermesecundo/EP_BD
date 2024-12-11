@@ -1,151 +1,98 @@
--- SCHEMA: public
+-- Inserindo dados na tabela CIDADE
+INSERT INTO CIDADE (nome_cidade, nome_estado) VALUES
+('Manaus', 'Amazonas'),
+('Fortaleza', 'Ceará'),
+('Florianópolis', 'Santa Catarina'),
+('Campo Grande', 'Mato Grosso do Sul'),
+('Goiânia', 'Goiás');
 
--- DROP SCHEMA IF EXISTS public ;
+-- Inserindo dados na tabela EMPRESA
+INSERT INTO EMPRESA (nome_empresa, endereco) VALUES
+('AmazonCargo', 'Rua Y, 678, Manaus'),
+('NordesteFretes', 'Av. Z, 789, Fortaleza'),
+('SulTransportes', 'Rua AA, 890, Florianópolis'),
+('PantanalLog', 'Av. AB, 901, Campo Grande'),
+('GoiasFrete', 'Rua AC, 102, Goiânia');
 
-CREATE SCHEMA IF NOT EXISTS public
-    AUTHORIZATION pg_database_owner;
+-- Inserindo dados na tabela CLIENTE
+INSERT INTO CLIENTE (cod_cliente, nome_cliente, endereco, cpf, rg) VALUES
+(9, 'Pedro Henrique', 'Rua AD, 203, Manaus', '23456789019', 'AM2345678'),
+(10, 'Ana Clara', 'Av. AE, 304, Fortaleza', '34567890128', 'CE3456789'),
+(11, 'Rita Fonseca', 'Rua AF, 405, Florianópolis', '45678901237', 'SC4567890'),
+(12, 'Cláudio Moura', 'Av. AG, 506, Campo Grande', '56789012346', 'MS5678901'),
+(13, 'Juliana Rocha', 'Rua AH, 607, Goiânia', '67890123455', 'GO6789012');
 
-COMMENT ON SCHEMA public
-    IS 'standard public schema';
+-- Inserindo dados na tabela FUNCIONARIO
+INSERT INTO FUNCIONARIO (cpf, rg, endereco, tipo_funcionario, nome_funcionario) VALUES
+('78901234568', 'AM7890123', 'Rua AI, 708, Manaus', 'Motorista', 'Tiago Freitas'),
+('89012345679', 'CE8901234', 'Av. AJ, 809, Fortaleza', 'Operador de Guindaste', 'Camila Monteiro'),
+('90123456789', 'SC9012345', 'Rua AK, 910, Florianópolis', 'Assistente', 'Roberta Nunes'),
+('01234567890', 'MS0123456', 'Av. AL, 101, Campo Grande', 'Gerente', 'Eduardo Silva'),
+('12345098764', 'GO1234509', 'Rua AM, 202, Goiânia', 'Motorista', 'Mariana Castro');
 
-GRANT USAGE ON SCHEMA public TO PUBLIC;
+-- Inserindo dados na tabela PEDIDO
+INSERT INTO PEDIDO (cod_pedido, cod_cliente, end_partida, end_destino, data_solicitacao, valor_total) VALUES
+(109, 9, 'Manaus', 'Fortaleza', '2024-12-17', 2600.00),
+(110, 10, 'Fortaleza', 'Florianópolis', '2024-12-18', 2700.00),
+(111, 11, 'Florianópolis', 'Campo Grande', '2024-12-19', 2800.00),
+(112, 12, 'Campo Grande', 'Goiânia', '2024-12-20', 2900.00),
+(113, 13, 'Goiânia', 'Manaus', '2024-12-21', 3000.00);
 
-GRANT ALL ON SCHEMA public TO pg_database_owner;
+-- Inserindo dados na tabela SERVICO
+INSERT INTO SERVICO (nome_servico, tipo_servico) VALUES
+('Mudança Corporativa', 'Logística'),
+('Transporte Rodoviário', 'Transporte'),
+('Guindaste Pesado', 'Construção'),
+('Gerenciamento de Estoque', 'Logística'),
+('Entrega Expressa', 'Transporte');
 
--- Inserção de Serviços
-insert into SERVICO (nome_servico, tipo_servico)
-values 
-('Transporte', 'Logística'),
-('Guindaste', 'Equipamento Pesado'),
-('Mudança', 'Serviço de Carga'),
-('Carregamento', 'Logística'),
-('Descarregamento', 'Logística'),
-('Transporte Urgente', 'Logística'),
-('Mudança Residencial', 'Serviço de Carga'),
-('Mudança Comercial', 'Serviço de Carga'),
-('Transporte de Carga Pesada', 'Logística'),
-('Embalagem', 'Serviço de Carga');
+-- Inserindo dados na tabela SERVICO_TRANSPORTE
+INSERT INTO SERVICO_TRANSPORTE (acrescimo, peso, nome_servico) VALUES
+(250.00, 1000.00, 'Mudança Corporativa'),
+(350.00, 1500.00, 'Transporte Rodoviário'),
+(120.00, 600.00, 'Entrega Expressa');
 
--- Inserção de Empresas
-insert into EMPRESA (nome_empresa, endereco)
-values 
-('Empresa A', 'Rua A, 100, São Paulo'),
-('Empresa B', 'Rua B, 200, Rio de Janeiro'),
-('Empresa C', 'Av. Rio Branco, 300, Salvador'),
-('Empresa D', 'Rua X, 400, Fortaleza'),
-('Empresa E', 'Rua Y, 500, Recife'),
-('Empresa F', 'Av. Paulista, 600, São Paulo'),
-('Empresa G', 'Rua Z, 700, Belo Horizonte'),
-('Empresa H', 'Av. Amazonas, 800, Manaus'),
-('Empresa I', 'Rua J, 900, Curitiba'),
-('Empresa J', 'Rua L, 1000, Porto Alegre');
+-- Inserindo dados na tabela GUINDASTE
+INSERT INTO GUINDASTE (base, altura, bonus, nome_servico) VALUES
+(18.00, 35.00, 600.00, 'Guindaste Pesado'),
+(20.00, 40.00, 700.00, 'Gerenciamento de Estoque');
 
--- Inserção de Clientes
-insert into CLIENTE (cod_cliente, nome_cliente, endereco, cpf, rg)
-values 
-(1, 'João Silva', 'Av. Paulista, 1000, SP', '12345678901', '123456789'),
-(2, 'Maria Oliveira', 'Rua 7, 200, RJ', '23456789012', '987654321'),
-(3, 'Carlos Souza', 'Rua 5, 300, BH', '34567890123', '564738291'),
-(4, 'Ana Costa', 'Av. Rio Branco, 1500, RJ', '45678901234', '192837465'),
-(5, 'Lucas Pereira', 'Rua 10, 400, SP', '56789012345', '183746192'),
-(6, 'Fernanda Lima', 'Rua 15, 500, Recife', '67890123456', '132435465'),
-(7, 'Ricardo Santos', 'Av. Brasil, 600, SP', '78901234567', '567890123'),
-(8, 'Patrícia Mendes', 'Rua da Paz, 700, Curitiba', '89012345678', '546372819'),
-(9, 'Eliane Rocha', 'Rua dos Três, 800, Salvador', '90123456789', '439182657'),
-(10, 'Eduardo Silva', 'Rua do Sol, 900, Porto Alegre', '01234567890', '324198765');
+-- Inserindo dados na tabela DETALHESSERVICO
+INSERT INTO DETALHESSERVICO (qtd_horas, data_efetivacao, cpf_funcionario, nome_servico, cod_pedido) VALUES
+(6, '2024-12-17', '78901234568', 'Mudança Corporativa', 109),
+(8, '2024-12-18', '89012345679', 'Transporte Rodoviário', 110),
+(10, '2024-12-19', '90123456789', 'Guindaste Pesado', 111),
+(7, '2024-12-20', '01234567890', 'Gerenciamento de Estoque', 112),
+(5, '2024-12-21', '12345098764', 'Entrega Expressa', 113);
 
--- Inserção de Funcionários
-insert into FUNCIONARIO (cpf, rg, endereco, tipo_funcionario, nome_cliente)
-values 
-('12345678901', '123456789', 'Rua X, 50, SP', 'Operador', 'João Silva'),
-('23456789012', '987654321', 'Rua Y, 150, RJ', 'Gerente', 'Maria Oliveira'),
-('34567890123', '564738291', 'Rua Z, 200, BH', 'Supervisor', 'Carlos Souza'),
-('45678901234', '192837465', 'Rua W, 250, SP', 'Operador', 'Ana Costa'),
-('56789012345', '183746192', 'Rua V, 300, SP', 'Motorista', 'Lucas Pereira'),
-('67890123456', '132435465', 'Rua U, 350, Recife', 'Gerente', 'Fernanda Lima'),
-('78901234567', '567890123', 'Rua T, 400, SP', 'Supervisor', 'Ricardo Santos'),
-('89012345678', '546372819', 'Rua S, 450, Curitiba', 'Operador', 'Patrícia Mendes'),
-('90123456789', '439182657', 'Rua R, 500, Salvador', 'Motorista', 'Eliane Rocha'),
-('01234567890', '324198765', 'Rua Q, 550, Porto Alegre', 'Operador', 'Eduardo Silva');
+-- Inserindo dados na tabela OFERTASERVICOEM
+INSERT INTO OFERTASERVICOEM (nome_empresa, nome_cidade, nome_servico, preco_hora) VALUES
+('AmazonCargo', 'Manaus', 'Mudança Corporativa', 150.00),
+('NordesteFretes', 'Fortaleza', 'Transporte Rodoviário', 200.00),
+('SulTransportes', 'Florianópolis', 'Guindaste Pesado', 250.00),
+('PantanalLog', 'Campo Grande', 'Gerenciamento de Estoque', 180.00),
+('GoiasFrete', 'Goiânia', 'Entrega Expressa', 100.00);
 
--- Inserção de Pedidos (Devem vir antes de DETALHESSERVICO)
-insert into PEDIDO (Cod_pedido, End_partida, End_destino, Data_solicitacao, Valor_total)
-values 
-(101, 'Rua A, 100, SP', 'Rua B, 200, RJ', '2024-12-01', 200.00),
-(102, 'Rua X, 150, SP', 'Rua Y, 250, RJ', '2024-12-02', 300.00),
-(103, 'Rua Z, 200, BH', 'Rua W, 300, SP', '2024-12-03', 150.00),
-(104, 'Av. Rio Branco, 250, SP', 'Av. Brasil, 350, RJ', '2024-12-04', 450.00),
-(105, 'Rua V, 300, SP', 'Rua U, 400, SP', '2024-12-05', 500.00),
-(106, 'Rua W, 350, SP', 'Rua X, 450, SP', '2024-12-06', 250.00),
-(107, 'Rua Y, 400, SP', 'Rua Z, 500, SP', '2024-12-07', 600.00),
-(108, 'Rua T, 450, SP', 'Rua S, 550, SP', '2024-12-08', 700.00),
-(109, 'Rua R, 500, SP', 'Rua Q, 600, SP', '2024-12-09', 350.00),
-(110, 'Rua P, 550, SP', 'Rua O, 650, SP', '2024-12-10', 800.00);
+-- Inserindo dados na tabela TELEFONECLIENTE
+INSERT INTO TELEFONECLIENTE (telefone, cod_cliente) VALUES
+('92999999999', 9),
+('85999999999', 10),
+('48999999999', 11),
+('67999999999', 12),
+('62999999999', 13);
 
--- Inserção de Detalhes de Serviço (Após os pedidos)
-insert into DETALHESSERVICO (qtd_horas, data_efetivacao, cpf_funcionario, nome_servico, cod_pedido)
-values 
-(5, '2024-12-01', '12345678901', 'Transporte', 101),
-(3, '2024-12-02', '23456789012', 'Mudança', 102),
-(6, '2024-12-03', '34567890123', 'Guindaste', 103),
-(4, '2024-12-04', '45678901234', 'Transporte Urgente', 104),
-(7, '2024-12-05', '56789012345', 'Carregamento', 105),
-(2, '2024-12-06', '67890123456', 'Descarregamento', 106),
-(8, '2024-12-07', '78901234567', 'Mudança Comercial', 107),
-(9, '2024-12-08', '89012345678', 'Mudança Residencial', 108),
-(10, '2024-12-09', '90123456789', 'Transporte', 109),
-(5, '2024-12-10', '01234567890', 'Guindaste', 110);
+-- Inserindo na tabela TELEFONEEMPRESA
+INSERT INTO TELEFONEEMPRESA (telefone, nome_empresa) VALUES
+('92988888888', 'AmazonCargo'),
+('85888888888', 'NordesteFretes'),
+('48888888888', 'SulTransportes'),
+('67888888888', 'PantanalLog'),
+('62888888888', 'GoiasFrete');
 
-insert into CIDADE (nome_cidade, nome_estado)
-values 
-('São Paulo', 'SP'),
-('Rio de Janeiro', 'RJ'),
-('Salvador', 'BA'),
-('Fortaleza', 'CE'),
-('Recife', 'PE'),
-('Belo Horizonte', 'MG'),
-('Manaus', 'AM'),
-('Curitiba', 'PR'),
-('Porto Alegre', 'RS');
-
--- Inserção de Serviços em OFERTASERVICOEM
-insert into OFERTASERVICOEM (nome_empresa, nome_cidade, nome_servico, preco_hora)
-values 
-('Empresa A', 'São Paulo', 'Transporte', 50.00),
-('Empresa B', 'Rio de Janeiro', 'Mudança', 70.00),
-('Empresa C', 'Salvador', 'Guindaste', 80.00),
-('Empresa D', 'Fortaleza', 'Carregamento', 60.00),
-('Empresa E', 'Recife', 'Descarregamento', 65.00),
-('Empresa F', 'São Paulo', 'Mudança Residencial', 85.00),
-('Empresa G', 'Belo Horizonte', 'Mudança Comercial', 90.00),
-('Empresa H', 'Manaus', 'Transporte Urgente', 95.00),
-('Empresa I', 'Curitiba', 'Transporte', 100.00),
-('Empresa J', 'Porto Alegre', 'Guindaste', 110.00);
-
--- Inserção de Telefones de Clientes
-insert into TELEFONECLIENTE (telefone, cod_cliente)
-values 
-('11987654321', 1),
-('21987654321', 2),
-('31987654321', 3),
-('41987654321', 4),
-('51987654321', 5),
-('61987654321', 6),
-('71987654321', 7),
-('81987654321', 8),
-('91987654321', 9),
-('11987654322', 10);
-
--- Inserção de Telefones de Empresas
-insert into TELEFONEEMPRESA (telefone, nome_empresa)
-values 
-('11387654321', 'Empresa A'),
-('21387654321', 'Empresa B'),
-('31387654321', 'Empresa C'),
-('41387654321', 'Empresa D'),
-('51387654321', 'Empresa E'),
-('61387654321', 'Empresa F'),
-('71387654321', 'Empresa G'),
-('81387654321', 'Empresa H'),
-('91387654321', 'Empresa I'),
-('01387654321', 'Empresa J');
+-- Inserindo na tabela TELEFONEFUNCIONARIO
+INSERT INTO TELEFONEFUNCIONARIO (telefone, cpf_funcionario) VALUES
+('92977777777', '78901234568'),
+('85777777777', '89012345679'),
+('48777777777', '90123456789'),
+('67777777777', '01234567890'),
+('62777777777', '12345098764');

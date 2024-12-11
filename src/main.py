@@ -3,7 +3,7 @@ from db_connection import conectar_banco
 
 #importar consultas dps
 
-#from consultas import consulta_2
+from consultas import (consulta_1, consulta_2, consulta_3, consulta_4, consulta_5, consulta_6, consulta_7, consulta_8, consulta_9, consulta_10) 
  
 def menu_banco():
     while True:

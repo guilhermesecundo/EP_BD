@@ -26,7 +26,7 @@ create table FUNCIONARIO (
     rg CHAR(10),
     endereco VARCHAR(100),
     tipo_funcionario VARCHAR(50),
-    nome_cliente VARCHAR(50),
+    nome_funcionario VARCHAR(50),
     constraint ID_FUNCIONARIO primary key (cpf)
 );
 
@@ -70,6 +70,7 @@ create table CIDADE (
 
 create table PEDIDO (
     Cod_pedido INT not null,
+    Cod_cliente INT not null,
     End_partida VARCHAR(100),
     End_destino VARCHAR(100),
     Data_solicitacao DATE,
@@ -129,6 +130,10 @@ alter table DETALHESSERVICO add constraint FK_DETALHESERVICO_SERVICO
     foreign key (nome_servico)
     references SERVICO (nome_servico) on delete cascade on update cascade;
 
+alter table PEDIDO add constraint FK_PEDIDO_CLIENTE 
+    foreign key (cod_cliente)
+    references CLIENTE (cod_cliente) on delete cascade on update cascade;
+
 alter table DETALHESSERVICO add constraint FK_DETALHESERVICO_PEDIDO 
     foreign key (cod_pedido)
     references PEDIDO (cod_pedido) on delete cascade on update cascade;
@@ -156,3 +161,4 @@ alter table TELEFONEEMPRESA add constraint FK_TEL_EMPRESA
 alter table TELEFONEFUNCIONARIO add constraint FK_TEL_FUNCIONARIO 
     foreign key (cpf_funcionario)
     references FUNCIONARIO (cpf) on delete cascade on update cascade;
+
