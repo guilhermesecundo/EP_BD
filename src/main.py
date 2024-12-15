@@ -3,6 +3,46 @@ from tkinter import ttk
 import psycopg2
 from consultas import (consulta_1, consulta_2, consulta_3, consulta_4, consulta_5, consulta_6, consulta_7, consulta_8, consulta_9, consulta_10)
 from db_connection import conectar_banco
+from tabulate import tabulate
+
+opcoes = [
+    "Tipo de serviços que um determinado cliente solicitou no último mês",
+    "Empresa que mais ofereceu serviços à cidade Y do estado Z",
+    "Funcionários que trabalharam para o cliente X no mês Y do ano Z",
+    "Solicitações feitas no último ano, junto ao cliente, locais e preço total de cada solicitação",
+    "Faturamento das empresas por mês em um ano X.",
+    "Serviço mais solicitado no último mês entre todas empresas",
+    "Nome do serviço mais solicitado, e o número de solicitações para cada empresa",
+    "Cidade com o maior número de solicitações",
+    "Cidade destino mais referenciada nos pedidos e a sua quantidade de pedidos",
+    "Empresas e o seu faturamento total"
+]
+
+opcoes_num_param = [
+    ["Nome do Cliente"],
+    ["Nome da Cidade", "Nome do Estado"],
+    ["Nome do Cliente", "Mês", "Ano"],
+    [],
+    ["Ano"],
+    [],
+    [],
+    [],
+    [],
+    []
+]
+
+cabecalho = [
+    ["Nome Servico", "Horas", "Total", "Data de Solicitação"],
+    ["Nome da Empresa", "Quantidade"],
+    ["Nome do Funcionario", "CPF"],
+    ["Pedido", "Nome do Cliente", "Origem", "Destino", "Preço Total"],
+    ["Nome da Empresa", "Mês", "Faturamento"],
+    ["Nome do Serviço", "Quantidade"],
+    ["Nome da Empresa", "Nome do Servico", "Solicitações"],
+    ["Nome da Cidade", "Quantidade"],
+    ["Nome da Cidade", "Quantidade"],
+    ["Nome da Empresa", "Faturamento Total"]
+]
 
 def consulta():
     resultado_texto.delete("1.0","end")
@@ -20,16 +60,12 @@ def consulta():
         
 
     resultado = connect_to_db(query, query_params)
-    
-    #aqui em result ent ele volta o que veio da consulta
-    #Em query tem um numero indicando a consulta (0-9)
-    #Em query_params tem um array que caso necessario, tem os 
-    #parametros passados X Y Z nas posicoes 0, 1, 2
-    #result = insira_funcao(query, query_params)
 
-    #Teste
-    resultado_texto.insert(tk.END, resultado)
-    #print(query_params)
+    if resultado and isinstance(resultado, tuple):  # Se for uma única linha (tupla)
+        resultado = [resultado]
+    
+    resultado_texto.insert(tk.END, tabulate(resultado, headers=cabecalho[int(query) - 1], tablefmt="grid"))
+        
 
 def connect_to_db(query, query_params):
     resultado = ""
@@ -73,6 +109,7 @@ def connect_to_db(query, query_params):
         print(f"erro inesperado: {e}")
     return resultado
 
+#Interface
 
 def show_param1(new_text):
     lbl_param1.place(x=10, y=50, width=120, height=25)
@@ -117,42 +154,16 @@ def option_selected(event):
 janela = tk.Tk()
 janela.title("Interface de Consulta ao Banco de Dados")
 
-janela.geometry("660x500")
+janela.geometry("760x500")
 janela.resizable(False, False)
 
 # Dropdown
 label1 = tk.Label(janela, text="Selecione a consulta", anchor="w")
 label1.place(x=10, y=10, width=120, height=25)
 
-opcoes = [
-    "Tipo de serviços que um determinado cliente solicitou no último mês",
-    "Empresa que mais ofereceu serviços à cidade Y do estado Z",
-    "Funcionários que trabalharam para o cliente X no mês Y do ano Z",
-    "Solicitações feitas no último ano, junto ao cliente, locais e preço total de cada solicitação",
-    "Faturamento das empresas por mês em um ano X.",
-    "Serviço mais solicitado no último mês entre todas empresas",
-    "Nome do serviço mais solicitado, e o número de solicitações para cada empresa",
-    "Cidade com o maior número de solicitações",
-    "Cidade destino mais referenciada nos pedidos e a sua quantidade de pedidos",
-    "Empresas e o seu faturamento total"
-]
-
-opcoes_num_param = [
-    ["Nome do Cliente"],
-    ["Nome da Cidade", "Nome do Estado"],
-    ["Nome do Cliente", "Mês", "Ano"],
-    [],
-    ["Ano"],
-    [],
-    [],
-    [],
-    [],
-    []
-]
-
 menu_dropdown = ttk.Combobox(janela, values=opcoes, state="readonly")
 menu_dropdown.set(opcoes[0])
-menu_dropdown.place(x=135, y=10, width=510, height=25)
+menu_dropdown.place(x=135, y=10, width=610, height=25)
 menu_dropdown.bind("<<ComboboxSelected>>", option_selected)
 
 # Inputs e Labels
@@ -170,14 +181,27 @@ input_param3 = tk.Entry(janela)
 
 # Botão Consultar
 btn_consultar = tk.Button(janela, text="Consultar", command=consulta)
-btn_consultar.place(x=565, y=240, width=80, height=25)
+btn_consultar.place(x=665, y=240, width=80, height=25)
 
 # Área de Resultados
 resultado_label = tk.Label(janela, text="Área de Resultados")
 resultado_label.place(x=10, y=240, width=120, height=25)
 
-resultado_texto = tk.Text(janela, height=10)
-resultado_texto.place(x=10, y=270, width=635, height=220)
+# Frame para organizar Text e Scrollbar
+resultado_frame = tk.Frame(janela)
+resultado_frame.place(x=10, y=270, width=735, height=220)
+
+# Scrollbar vertical
+scrollbar = tk.Scrollbar(resultado_frame)
+scrollbar.pack(side="right", fill="y")
+
+# Área de texto (associada à Scrollbar)
+resultado_texto = tk.Text(resultado_frame, height=10, yscrollcommand=scrollbar.set, wrap="none")
+resultado_texto.pack(side="left", fill="both", expand=True)
+
+# Configurar Scrollbar para controlar a área de texto
+scrollbar.config(command=resultado_texto.yview)
+scrollbar.config(command=resultado_texto.xview)
 
 # Iniciar o loop da interface
 janela.mainloop()

@@ -8,7 +8,7 @@ def conectar_banco():
         conn = psycopg2.connect(
             dbname="mudancas_servicos",  
             user="postgres",             
-            password="1234",             
+            password="12345",             
             host="localhost",            
             port="5432"                  
         )
