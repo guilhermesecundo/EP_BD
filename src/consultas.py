@@ -1,4 +1,4 @@
-from db_connection import conectar_banco
+from  db_app_connection import conectar_banco
 import psycopg2
 
 # 1: Quais serviços um determinado cliente X solicitou no último mês

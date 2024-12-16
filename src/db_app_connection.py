@@ -8,7 +8,7 @@ def conectar_banco():
         conn = psycopg2.connect(
             dbname="mudancas_servicos",  
             user="postgres",             
-            password="12345",             
+            password="1234",             
             host="localhost",            
             port="5432"                  
         )
@@ -16,3 +16,4 @@ def conectar_banco():
     
     except Exception as e:
         return None
+

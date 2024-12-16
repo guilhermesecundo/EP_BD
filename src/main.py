@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import psycopg2
 from consultas import (consulta_1, consulta_2, consulta_3, consulta_4, consulta_5, consulta_6, consulta_7, consulta_8, consulta_9, consulta_10)
-from db_connection import conectar_banco
+from db_app_connection import conectar_banco
 from tabulate import tabulate
 
 opcoes = [
