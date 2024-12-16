@@ -58,8 +58,9 @@ create table DETALHESSERVICO (
     data_efetivacao DATE,
     cpf_funcionario CHAR(11) not null,
     nome_servico VARCHAR(50) not null,
+    nome_empresa VARCHAR(50) not null,
     cod_pedido INT not null,
-    constraint ID_DETALHESSERVICO primary key (cpf_funcionario, nome_servico, cod_pedido)
+    constraint ID_DETALHESSERVICO primary key (cpf_funcionario, nome_servico, cod_pedido, nome_empresa)
 );
 
 create table CIDADE (
@@ -162,3 +163,40 @@ alter table TELEFONEFUNCIONARIO add constraint FK_TEL_FUNCIONARIO
     foreign key (cpf_funcionario)
     references FUNCIONARIO (cpf) on delete cascade on update cascade;
 
+CREATE OR REPLACE FUNCTION atualizar_preco_pedido()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE Pedido
+    SET valor_total = (
+        SELECT SUM(
+            DS.qtd_horas * OSE.preco_hora + 
+            COALESCE(ST.acrescimo, 0) + 
+            COALESCE(G.bonus, 0)
+        )
+        FROM detalheservico DS
+        JOIN ofertaservicoem OSE 
+            ON DS.nome_servico = OSE.nome_servico
+           AND DS.nome_empresa = OSE.nome_empresa
+           AND OSE.nome_cidade = NEW.end_partida
+        
+        -- LEFT JOIN para incluir acréscimos (serviço transporte)
+        LEFT JOIN servico_transporte ST 
+            ON DS.nome_servico = ST.nome_servico
+        
+        -- LEFT JOIN para incluir bônus (guindaste)
+        LEFT JOIN guindaste G 
+            ON DS.nome_servico = G.nome_servico
+        
+        WHERE DS.cod_pedido = NEW.cod_pedido
+    )
+    WHERE cod_pedido = NEW.cod_pedido;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger que dispara a função após INSERT ou UPDATE na tabela Inclui
+CREATE TRIGGER trigger_atualizar_preco_pedido
+AFTER INSERT OR UPDATE ON Pedido
+FOR EACH ROW
+EXECUTE FUNCTION atualizar_preco_pedido();
