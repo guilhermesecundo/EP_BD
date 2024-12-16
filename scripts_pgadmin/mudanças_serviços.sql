@@ -167,27 +167,27 @@ CREATE OR REPLACE FUNCTION atualizar_preco_pedido()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE Pedido
-    SET valor_total = (
+    SET valor_total = valor_total + (
         SELECT SUM(
-            DS.qtd_horas * OSE.preco_hora + 
+            NEW.qtd_horas * OSE.preco_hora + 
             COALESCE(ST.acrescimo, 0) + 
             COALESCE(G.bonus, 0)
         )
-        FROM detalheservico DS
-        JOIN ofertaservicoem OSE 
-            ON DS.nome_servico = OSE.nome_servico
-           AND DS.nome_empresa = OSE.nome_empresa
-           AND OSE.nome_cidade = NEW.end_partida
+        FROM OFERTASERVICOEM OSE
+        JOIN PEDIDO P ON OSE.cod_pedido = P.cod_pedido
+        WHERE OSE.nome_empresa = NEW.nome_empresa
+        AND OSE.nome_servico = NEW.nome_servico
+        AND OSE.nome_cidade = (SELECT End_partida
+                               FROM Pedido P2
+                               WHERE P2.cod_pedido = NEW.cod_pedido)
         
         -- LEFT JOIN para incluir acréscimos (serviço transporte)
         LEFT JOIN servico_transporte ST 
-            ON DS.nome_servico = ST.nome_servico
+            ON OSE.nome_servico = ST.nome_servico
         
         -- LEFT JOIN para incluir bônus (guindaste)
         LEFT JOIN guindaste G 
-            ON DS.nome_servico = G.nome_servico
-        
-        WHERE DS.cod_pedido = NEW.cod_pedido
+            ON OSE.nome_servico = G.nome_servico
     )
     WHERE cod_pedido = NEW.cod_pedido;
     
@@ -197,6 +197,6 @@ $$ LANGUAGE plpgsql;
 
 -- Trigger que dispara a função após INSERT ou UPDATE na tabela Inclui
 CREATE TRIGGER trigger_atualizar_preco_pedido
-AFTER INSERT OR UPDATE ON Pedido
+AFTER INSERT OR UPDATE ON DETALHESSERVICO
 FOR EACH ROW
 EXECUTE FUNCTION atualizar_preco_pedido();
