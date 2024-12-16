@@ -58,12 +58,12 @@ INSERT INTO GUINDASTE (base, altura, bonus, nome_servico) VALUES
 (20.00, 40.00, 700.00, 'Gerenciamento de Estoque');
 
 -- Inserindo dados na tabela DETALHESSERVICO
-INSERT INTO DETALHESSERVICO (qtd_horas, data_efetivacao, cpf_funcionario, nome_servico, cod_pedido) VALUES
-(6, '2024-12-17', '78901234568', 'Mudança Corporativa', 109),
-(8, '2024-12-18', '89012345679', 'Transporte Rodoviário', 110),
-(10, '2024-12-19', '90123456789', 'Guindaste Pesado', 111),
-(7, '2024-12-20', '01234567890', 'Gerenciamento de Estoque', 112),
-(5, '2024-12-21', '12345098764', 'Entrega Expressa', 113);
+INSERT INTO DETALHESSERVICO (qtd_horas, data_efetivacao, cpf_funcionario, nome_servico, nome_empresa, cod_pedido) VALUES
+(6, '2024-12-17', '78901234568', 'Mudança Corporativa', 'AmazonCargo', 109),
+(8, '2024-12-18', '89012345679', 'Transporte Rodoviário', 'NordesteFretes', 110),
+(10, '2024-12-19', '90123456789', 'Guindaste Pesado', 'SulTransportes',  111),
+(7, '2024-12-20', '01234567890', 'Gerenciamento de Estoque', 'PantanalLog', 112),
+(5, '2024-12-21', '12345098764', 'Entrega Expressa', 'GoiasFrete', 113);
 
 -- Inserindo dados na tabela OFERTASERVICOEM
 INSERT INTO OFERTASERVICOEM (nome_empresa, nome_cidade, nome_servico, preco_hora) VALUES
@@ -96,3 +96,38 @@ INSERT INTO TELEFONEFUNCIONARIO (telefone, cpf_funcionario) VALUES
 ('48777777777', '90123456789'),
 ('67777777777', '01234567890'),
 ('62777777777', '12345098764');
+
+CREATE OR REPLACE FUNCTION atualizar_preco_pedido()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE Pedido
+    SET Valor_total = Valor_total + (
+        SELECT SUM(
+            NEW.qtd_horas * OSE.preco_hora + 
+            COALESCE(ST.acrescimo, 0) + 
+            COALESCE(G.bonus, 0)
+        )
+        FROM OFERTASERVICOEM OSE
+        LEFT JOIN servico_transporte ST 
+            ON OSE.nome_servico = ST.nome_servico
+        LEFT JOIN guindaste G 
+            ON OSE.nome_servico = G.nome_servico
+        WHERE OSE.nome_empresa = NEW.nome_empresa
+          AND OSE.nome_servico = NEW.nome_servico
+          AND OSE.nome_cidade = (
+              SELECT End_partida
+              FROM Pedido P2
+              WHERE P2.cod_pedido = NEW.cod_pedido
+          )
+    )
+    WHERE cod_pedido = NEW.cod_pedido;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger que dispara a função após INSERT ou UPDATE na tabela DETALHESSERVICO
+CREATE TRIGGER trigger_atualizar_preco_pedido
+BEFORE INSERT OR UPDATE ON DETALHESSERVICO
+FOR EACH ROW
+EXECUTE FUNCTION atualizar_preco_pedido();
